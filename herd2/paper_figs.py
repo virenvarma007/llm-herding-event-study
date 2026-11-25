@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 OUT = Path("out"); FIG = Path("paper/figs"); FIG.mkdir(parents=True, exist_ok=True)
 COL = {"mono": "#2a78d6", "persona": "#eb6834", "mixed": "#1baf7a", "control": "#52514e"}
 LABEL = {"mono": "mono (Haiku)", "persona": "persona (Haiku, 5 prompts)", "mixed": "mixed (Haiku + DeepSeek)"}
-plt.rcParams.update({"font.size": 9, "axes.spines.top": False, "axes.spines.right": False,
+plt.rcParams.update({"font.size": 8, "font.family": "serif", "font.serif": ["Times New Roman", "Times", "Nimbus Roman", "DejaVu Serif"], "mathtext.fontset": "stix", "axes.spines.top": False, "axes.spines.right": False,
                      "axes.grid": True, "grid.alpha": 0.25, "grid.linewidth": 0.5, "legend.frameon": False})
 rng = np.random.default_rng(0)
 
@@ -24,7 +24,7 @@ for c in ["car_spy_d5", "car_spy_d2", "car_spy_d10"]:
     df["d_" + c] = df[c].values - ctrl[c].reindex(df.episode_id).values
 
 # ---- Fig 1: dose-response -------------------------------------------------
-fig, axes = plt.subplots(1, 2, figsize=(7.2, 3.0), sharey=True)
+fig, axes = plt.subplots(1, 2, figsize=(5.5, 2.6), sharey=True)
 for ax, scary, ttl in zip(axes, [True, False], ["Scary rumor (n = 24 episodes)", "Placebo news (n = 12 episodes)"]):
     for arm in ["mono", "persona", "mixed"]:
         xs, ms, los, his = [0.0], [0.0], [0.0], [0.0]
@@ -34,11 +34,11 @@ for ax, scary, ttl in zip(axes, [True, False], ["Scary rumor (n = 24 episodes)",
         ax.plot(xs, np.array(ms) * 100, "-o", color=COL[arm], lw=2, ms=5, label=LABEL[arm])
         ax.fill_between(xs, np.array(los) * 100, np.array(his) * 100, color=COL[arm], alpha=0.15, lw=0)
         if scary:
-            ax.annotate(f"{ms[-1]*100:+.1f}%", (1.0, ms[-1] * 100), xytext=(4, 0), textcoords="offset points", fontsize=8, va="center", color="#0b0b0b")
+            ax.annotate(f"{ms[-1]*100:+.1f}%", (1.0, ms[-1] * 100), xytext=(4, 0), textcoords="offset points", fontsize=7, va="center", color="#0b0b0b")
     ax.axhline(0, color="#52514e", lw=0.8); ax.set_xticks([0, 0.25, 0.5, 1.0]); ax.set_xlabel("share of LLM-driven agents")
     ax.set_title(ttl, fontsize=9); ax.set_xlim(-0.03, 1.15)
 axes[0].set_ylabel("SPY abnormal return, days 0–5,\nvs. share-0 control (pp)")
-axes[0].legend(loc="lower left", fontsize=8)
+axes[0].legend(loc="lower left", fontsize=7)
 fig.tight_layout(); fig.savefig(FIG / "fig1_dose_response.pdf"); fig.savefig(FIG / "fig1_dose_response.png", dpi=160); plt.close(fig)
 
 # ---- Fig 2: event-time CAR paths (scary), by arm, lines by share ---------
@@ -51,7 +51,7 @@ def car_paths(run_dir, scary=True):
         paths.append(np.cumsum(a[E - 5: E + 20]) - a[E - 5: E].sum())
     return np.array(paths)
 SHADE = {0.25: 0.35, 0.5: 0.65, 1.0: 1.0}
-fig, axes = plt.subplots(1, 3, figsize=(7.2, 2.7), sharey=True)
+fig, axes = plt.subplots(1, 3, figsize=(5.5, 2.3), sharey=True)
 ctrl_paths = car_paths(OUT / "mono_share0.00")
 x = np.arange(-5, 20)
 for ax, arm in zip(axes, ["mono", "persona", "mixed"]):
@@ -77,7 +77,7 @@ with open(OUT / "mixed_share1.00/llm_calls.jsonl") as f:
         s = [t for t in tr if str(t.get("action", "")).upper() == "SELL"]; b = [t for t in tr if str(t.get("action", "")).upper() == "BUY"]
         a[1] += bool(s); a[2] += bool(b); a[3] += sum(float(t.get("fraction") or 0) for t in s); a[4] += sum(float(t.get("fraction") or 0) for t in b)
 wins = ["pre\n(days 0–9)", "news\n(10–19)", "post\n(20–29)"]
-fig, axes = plt.subplots(1, 2, figsize=(7.2, 2.6))
+fig, axes = plt.subplots(1, 2, figsize=(5.5, 2.2))
 for ax, (idx, ttl, ylab) in zip(axes, [(1, "share of calls that SELL", "% of calls"), (3, "requested sell size per call", "fraction of portfolio")]):
     xs = np.arange(3); w = 0.36
     for k, (prov, name, col) in enumerate([("anthropic", "Haiku 5.5", "#2a78d6"), ("openrouter_a", "DeepSeek V4.1 Flash", "#eda100")]):
@@ -89,12 +89,12 @@ for ax, (idx, ttl, ylab) in zip(axes, [(1, "share of calls that SELL", "% of cal
         for bar, v in zip(bars, vals):
             ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height(), f"{v:.0f}" if idx == 1 else f"{v:.3f}", ha="center", va="bottom", fontsize=7, color="#0b0b0b")
     ax.set_xticks(xs); ax.set_xticklabels(wins, fontsize=8); ax.set_title(ttl, fontsize=9); ax.set_ylabel(ylab); ax.grid(axis="x", alpha=0)
-axes[0].legend(fontsize=8, loc="upper left")
+axes[0].legend(fontsize=7, loc="upper left")
 fig.tight_layout(); fig.savefig(FIG / "fig3_mixed_behaviour.pdf"); fig.savefig(FIG / "fig3_mixed_behaviour.png", dpi=160); plt.close(fig)
 
 # ---- Fig 4: episode-level paired effects at share 1.0 (scary) ------------
 p = df[(df.share == 1.0) & (df.scary)].pivot(index="episode_id", columns="arm", values="d_car_spy_d5") * 100
-fig, ax = plt.subplots(figsize=(7.2, 2.4))
+fig, ax = plt.subplots(figsize=(5.5, 2.1))
 for i, arm in enumerate(["mono", "persona", "mixed"]):
     y = np.full(len(p), i) + rng.uniform(-0.12, 0.12, len(p))
     ax.scatter(p[arm], y, s=18, color=COL[arm], alpha=0.75, lw=0)
