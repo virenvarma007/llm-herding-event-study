@@ -3,8 +3,8 @@
   "share": 0.5,
   "provider_override": null,
   "cfg": {
-    "data_dir": "/Users/virenvarma/Downloads/AI Herd experiment/Current Backup/data",
-    "out_dir": "/Users/virenvarma/Downloads/AI Herd experiment/v2_event_study/out",
+    "data_dir": "<data_dir>",
+    "out_dir": "out",
     "seed": 42,
     "assets": [
       "SPY",
@@ -119,6 +119,6 @@
         "mixed"
       ]
     },
-    "_config_path": "/Users/virenvarma/Downloads/AI Herd experiment/v2_event_study/config.yaml"
+    "_config_path": "config.yaml"
   }
 }

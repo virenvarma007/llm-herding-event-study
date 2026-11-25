@@ -8,16 +8,16 @@ No LaTeX is installed on this machine, so the manuscript has not been compiled h
 ## Before you upload (30 minutes)
 
 1. **Compile once on Overleaf** (free): New Project -> Upload Project -> the zip. Compiler: pdfLaTeX. Fix any error it shows.
-2. In `main.tex` replace `TODO@gatech.edu` and the `TODO: repository URL` line (push `herd2/`, `config.yaml`, `requirements.txt`, `README.md` to a public GitHub repo; do NOT push `.env`, `out/llm_cache.sqlite`, or the CRSP CSVs).
+2. Code is public at https://github.com/virenvarma007/llm-herding-event-study (never push `.env`, `out/llm_cache.sqlite`, or the CRSP CSVs).
 3. In `refs.bib` fix the entries marked `TODO` (author lists for hansen2025, twinmarket2025, xia2026, scis2026). Open each arXiv/DOI page and copy the authors.
-4. Decide the affiliation line. "Georgia Institute of Technology" is what your Scholar profile says. Adding Amazon may require Amazon's publication approval; check your employment agreement first.
+4. Affiliation line is "Independent Researcher, Seattle, WA"; no email is printed.
 5. Delete the HTML-comment reminder block at the bottom of `../PAPER_DRAFT.md` if you ever export that file; `main.tex` does not contain it.
 
 ## arXiv settings
 
 - Primary category: **q-fin.TR** (Trading and Market Microstructure). Cross-lists: **cs.MA** (Multiagent Systems), **cs.CE**, **cs.AI**.
 - License: arXiv.org perpetual non-exclusive (default) is fine for later journal submission to Springer (JEIC) and TMLR.
-- First-time submitters in q-fin may need an endorsement; a gatech.edu email usually auto-qualifies. If asked, the endorsement request form names people who can endorse.
+- First-time submitters in q-fin may need an endorsement; if asked, the endorsement request form names people who can endorse.
 - Submissions announced at 20:00 US Eastern on weekdays; submit before 14:00 ET to be announced the same evening.
 
 ## After it is live
