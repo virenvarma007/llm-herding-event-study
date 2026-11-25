@@ -1,0 +1,24 @@
+# secrets and local environment
+.env
+.venv/
+__pycache__/
+*.pyc
+
+# large / derived outputs: keep only per-episode metrics + timeseries and the aggregate tables
+out/llm_cache.sqlite
+out/spend_ledger.jsonl
+out/logs/
+out/_check/
+out/_invalid_mixed_keylimit/
+out/**/llm_calls.jsonl
+out/**/actions.csv
+out_mock/
+*_mock*/
+
+# paper build artefacts
+paper/_pages/
+paper/arxiv_package.zip
+
+# internal planning notes (not part of the release)
+PAPER_DRAFT.md
+VENUES.md

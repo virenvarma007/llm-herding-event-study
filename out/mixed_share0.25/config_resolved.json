@@ -1,0 +1,124 @@
+{
+  "arm": "mixed",
+  "share": 0.25,
+  "provider_override": null,
+  "cfg": {
+    "data_dir": "/Users/virenvarma/Downloads/AI Herd experiment/Current Backup/data",
+    "out_dir": "/Users/virenvarma/Downloads/AI Herd experiment/v2_event_study/out",
+    "seed": 42,
+    "assets": [
+      "SPY",
+      "QQQ",
+      "XLF",
+      "AAPL",
+      "NVDA"
+    ],
+    "episodes": {
+      "n_scary": 24,
+      "n_placebo": 12,
+      "length": 30,
+      "event_day": 10,
+      "lookback": 20,
+      "date_range": [
+        "2016-01-01",
+        "2023-12-31"
+      ],
+      "window_seed": 2026
+    },
+    "agents": {
+      "n_agents": 100,
+      "initial_cash": 100000.0,
+      "equity_fraction": 0.5,
+      "max_trade_fraction": 0.2,
+      "rule_weights": [
+        0.5,
+        0.3,
+        0.2
+      ]
+    },
+    "market": {
+      "impact_alpha": 0.25,
+      "depth_multiple": 5.0,
+      "base_spread_bps": 5.0,
+      "vol_sensitivity": 2.0,
+      "imbalance_sensitivity": 1.5,
+      "max_daily_impact": 0.08
+    },
+    "news": {
+      "severity": 0.7,
+      "active_days": 10
+    },
+    "llm": {
+      "prompt_variant": "free",
+      "concurrency": 6,
+      "max_tokens": 400,
+      "cache": true,
+      "spend_cap_usd": {
+        "anthropic": 80.0,
+        "openrouter": 15.0
+      },
+      "providers": {
+        "anthropic": {
+          "kind": "anthropic",
+          "model": "claude-haiku-5-5",
+          "effort": "low",
+          "price_in_per_m": 0.1,
+          "price_out_per_m": 0.5
+        },
+        "openrouter_a": {
+          "kind": "openrouter",
+          "model": "deepseek/deepseek-v4.1-flash-1017"
+        },
+        "openrouter_b": {
+          "kind": "openrouter",
+          "model": "qwen/qwen3.7-flash"
+        }
+      },
+      "arms": {
+        "mono": {
+          "providers": [
+            "anthropic"
+          ],
+          "personas": [
+            "baseline"
+          ]
+        },
+        "persona": {
+          "providers": [
+            "anthropic"
+          ],
+          "personas": [
+            "cautious",
+            "momentum",
+            "contrarian",
+            "news",
+            "arbitrage"
+          ]
+        },
+        "mixed": {
+          "providers": [
+            "anthropic",
+            "openrouter_a"
+          ],
+          "personas": [
+            "baseline"
+          ]
+        }
+      }
+    },
+    "sweep": {
+      "shares": [
+        0.0,
+        0.25,
+        0.5,
+        1.0
+      ],
+      "arms": [
+        "mono",
+        "persona",
+        "mixed"
+      ]
+    },
+    "_config_path": "/Users/virenvarma/Downloads/AI Herd experiment/v2_event_study/config.yaml"
+  }
+}

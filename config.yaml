@@ -1,0 +1,72 @@
+# AI Herd v2 -- event-study design
+# All configs (arm x share) share the SAME episode windows and news assignment (paired design).
+
+data_dir: "../Current Backup/data"     # reuses the CRSP CSVs from v1 (read-only)
+out_dir: "out"
+seed: 42
+
+assets: [SPY, QQQ, XLF, AAPL, NVDA]
+
+episodes:
+  n_scary: 24          # episodes with a fear-inducing rumor on event_day
+  n_placebo: 12        # episodes with neutral news on event_day (control for "any news")
+  length: 30           # trading days per episode
+  event_day: 10        # 0-indexed step on which the news appears
+  lookback: 20         # extra real days before the window, for initial volatility
+  date_range: ["2016-01-01", "2023-12-31"]
+  window_seed: 2026    # fixed: same windows for every arm/share
+
+agents:
+  n_agents: 100
+  initial_cash: 100000.0      # median; log-normal sigma 0.8 -> few large, many small
+  equity_fraction: 0.5        # start 50% invested, equal-weight across assets (so SELL is possible)
+  max_trade_fraction: 0.2     # single trade <= 20% of portfolio value
+  rule_weights: [0.5, 0.3, 0.2]   # fundamental, trend, noise (heterogeneous parameters per agent)
+
+market:
+  # price move per day = fundamental return + impact_alpha * net_shares / depth
+  # depth = depth_multiple * (aggregate initial shares held by all agents in that asset)
+  # -> if every agent sells 20% of holdings in one day: impact = alpha * 0.2 / depth_multiple
+  # calibration: if EVERY agent dumps its whole SPY position on one day -> impact = alpha/depth_multiple = -5%
+  # a single noise trade (one agent, 3% of wealth) moves the price ~0.015%
+  impact_alpha: 0.25
+  depth_multiple: 5.0
+  base_spread_bps: 5.0
+  vol_sensitivity: 2.0
+  imbalance_sensitivity: 1.5
+  max_daily_impact: 0.08
+
+news:
+  severity: 0.7
+  active_days: 10      # news shown to LLM agents on event_day .. event_day+active_days-1
+
+llm:
+  prompt_variant: free # free (main sweep) | per_asset (robustness check; see herd2/prompts.py for measured behaviour)
+  concurrency: 6       # parallel calls per run; 10 runs in parallel -> 60 in flight (~50 calls/s). Key limits (2026-11-23): 4000 req/min, 2M in-tok/min, 400k out-tok/min
+  max_tokens: 400      # JSON answer is ~100 tokens; thinking/reasoning is OFF so this is a hard cost ceiling per call
+  cache: true          # sqlite cache keyed by (model, system, user)
+  spend_cap_usd:       # hard stop, summed across ALL parallel runs via out/spend_ledger.jsonl
+    anthropic: 80.0      # balance 2026-11-23: $91.74; measured ~$0.00011 per call -> full sweep ~$40
+    openrouter: 15.0     # balance 2026-11-23: $18.81; measured ~$0.00012 per DeepSeek call -> ~$3
+  providers:
+    anthropic:
+      kind: anthropic
+      model: claude-haiku-5-5
+      effort: low
+      price_in_per_m: 0.10    # USD per 1M tokens (prompt <= 100K tokens)
+      price_out_per_m: 0.50
+    openrouter_a:
+      kind: openrouter
+      model: deepseek/deepseek-v4.1-flash-1017   # $0.03 in / $0.20 out per M (OpenRouter list, 2026-11-23); reasoning off
+    openrouter_b:
+      kind: openrouter
+      model: qwen/qwen3.7-flash                  # spare: $0.03 in / $0.13 out per M
+  arms:
+    # arm -> which providers the LLM agents are spread over (round-robin), and which personas
+    mono:    {providers: [anthropic],                               personas: [baseline]}
+    persona: {providers: [anthropic],                               personas: [cautious, momentum, contrarian, news, arbitrage]}
+    mixed:   {providers: [anthropic, openrouter_a],                 personas: [baseline]}   # 50/50 Haiku + 1 OpenRouter model (openrouter_b kept as a spare)
+
+sweep:
+  shares: [0.0, 0.25, 0.5, 1.0]
+  arms: [mono, persona, mixed]
