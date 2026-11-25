@@ -3,13 +3,13 @@
 Files to upload: `main.tex`, `refs.bib`, `figs/fig1_dose_response.pdf`, `figs/fig2_car_paths.pdf`,
 `figs/fig3_mixed_behaviour.pdf`, `figs/fig4_episode_effects.pdf` (zip them keeping the `figs/` folder).
 
-No LaTeX is installed on this machine, so the manuscript has not been compiled here.
+Compiled locally with `tectonic -X compile main.tex` (9 pages, no errors); `main.pdf` is the result.
 
-## Before you upload (30 minutes)
+## Before you upload
 
-1. **Compile once on Overleaf** (free): New Project -> Upload Project -> the zip. Compiler: pdfLaTeX. Fix any error it shows.
+1. Read `main.pdf` once end to end.
 2. Code is public at https://github.com/virenvarma007/llm-herding-event-study (never push `.env`, `out/llm_cache.sqlite`, or the CRSP CSVs).
-3. In `refs.bib` fix the entries marked `TODO` (author lists for hansen2025, twinmarket2025, xia2026, scis2026). Open each arXiv/DOI page and copy the authors.
+3. Reference author lists were checked against arXiv/publisher pages on 2026-11-25.
 4. Affiliation line is "Independent Researcher, Seattle, WA"; no email is printed.
 5. Delete the HTML-comment reminder block at the bottom of `../PAPER_DRAFT.md` if you ever export that file; `main.tex` does not contain it.
 
